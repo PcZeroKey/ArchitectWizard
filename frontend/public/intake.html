@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Project Intake Wizard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=IM+Fell+English&display=swap" rel="stylesheet">
+    <style>
+      :root {
+      --bg-dark: #150f28;
+      --bg-panel: #2b1f4d;
+      --card-bg: #2f2358;
+      --primary: #7c4dff;
+      --primary-dark: #5a32d6;
+      --primary-soft: #3a2d66;
+      --accent: #c9a227;
+      --accent-soft: #3a2d52;
+      --text: #ece3ff;
+      --muted: #b3a4d9;
+      --border: #4a3b7a;
+      --success: #4fd6a8;
+      --error: #ff6b6b;
+    }
+      
+    .sparkle-field {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .sparkle-field::before,
+    .sparkle-field::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(3px 3px at 20px 30px, var(--accent), transparent),
+        radial-gradient(4px 4px at 160px 120px, var(--text), transparent),
+        radial-gradient(2px 2px at 90px 200px, var(--accent), transparent),
+        radial-gradient(3px 3px at 280px 60px, var(--text), transparent),
+        radial-gradient(4px 4px at 340px 220px, var(--accent), transparent),
+        radial-gradient(2px 2px at 420px 140px, var(--text), transparent),
+        radial-gradient(3px 3px at 60px 320px, var(--accent), transparent),
+        radial-gradient(4px 4px at 500px 90px, var(--text), transparent),
+        radial-gradient(3px 3px at 130px 380px, var(--accent), transparent),
+        radial-gradient(2px 2px at 240px 340px, var(--text), transparent);
+      background-repeat: repeat;
+      background-size: 300px 220px;
+      animation: sparkle-drift 60s linear infinite, sparkle-twinkle 3s ease-in-out infinite alternate;
+      opacity: 0.85;
+    }
+
+    .sparkle-field::after {
+      background-size: 380px 280px;
+      animation-duration: 90s, 4s;
+      animation-delay: 0s, 1.5s;
+      opacity: 0.55;
+    }
+
+    @keyframes sparkle-drift {
+      from { transform: translateY(0); }
+      to { transform: translateY(-400px); }
+    }
+
+    @keyframes sparkle-twinkle {
+    from { opacity: 0.3; }
+    to { opacity: 1; }
+    }
+
+    .plus-sparkle {
+      position: fixed;
+      width: 20px;
+      height: 20px;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.9;
+      animation: plus-twinkle 2.5s ease-in-out infinite alternate;
+    }
+
+    .plus-sparkle::before,
+    .plus-sparkle::after {
+      content: '';
+      position: absolute;
+      background: var(--accent);
+      box-shadow: 0 0 12px 2px var(--accent), 0 0 24px 4px rgba(201, 162, 39, 0.6);
+      border-radius: 2px;
+    }
+
+    .plus-sparkle::before {
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      transform: translateY(-50%);
+    }
+
+    .plus-sparkle::after {
+    left: 50%;
+    top: 0;
+    width: 4px;
+    height: 100%;
+    transform: translateX(-50%);
+    }
+
+    @keyframes plus-twinkle {
+      from { opacity: 0.4; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1.15); }
+    }
+
+    .plus-sparkle {
+      position: fixed;
+      width: 20px;
+      height: 20px;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.9;
+      animation: plus-twinkle 2.5s ease-in-out infinite alternate;
+    }
+
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #2b1f4d 0%, #150f28 60%, #0d0a1a 100%);
+      font-family: 'IM Fell English', Georgia, serif;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .wizard-card {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 720px);
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 0 44px rgba(124, 77, 255, 0.3);
+    }
+
+    .hero {
+      background: linear-gradient(135deg, var(--bg-dark) 0%, var(--primary-dark) 60%, var(--primary) 100%);
+      color: #fff;
+      padding: 30px 28px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-family: 'Cinzel', serif;
+      font-size: clamp(2rem, 2.5vw, 2.8rem);
+      letter-spacing: 0.02em;
+      color: var(--accent);
+      text-shadow: 0 0 18px rgba(201, 162, 39, 0.4);
+    }
+
+    .hero p {
+      margin: 10px 0 0;
+      color: rgba(236, 227, 255, 0.9);
+      line-height: 1.5;
+    }
+
+    form {
+      padding: 28px;
+      background: var(--card-bg);
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: var(--text);
+      font-size: 1rem;
+      font-family: inherit;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #9689c2;
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .voice-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 8px;
+    }
+
+    .voice-button,
+    .primary-button,
+    .secondary-button {
+      border: none;
+      border-radius: 12px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      padding: 12px 16px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .voice-button:hover,
+    .primary-button:hover,
+    .secondary-button:hover {
+      transform: translateY(-1px);
+    }
+
+    .voice-button {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid rgba(201, 162, 39, 0.4);
+      box-shadow: 0 0 12px rgba(201, 162, 39, 0.18);
+    }
+
+    .primary-button {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      width: 100%;
+      box-shadow: 0 0 20px rgba(124, 77, 255, 0.45);
+    }
+
+    .secondary-button {
+      background: var(--primary-soft);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .guide-banner {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--primary-soft);
+      color: var(--accent);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .helper-text {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
+    .status {
+      min-height: 24px;
+      margin-top: 16px;
+      font-size: 0.96rem;
+      font-weight: 700;
+    }
+
+    .status.success { color: var(--success); }
+    .status.error { color: var(--error); }
+
+    a { color: var(--accent); }
+    a:hover { color: var(--text); }
+
+    @media (max-width: 640px) {
+      .row, .actions {
+        grid-template-columns: 1fr;
+        display: grid;
+      }
+    }
+
+    </style>
+  </head>
+  <body>
+    <div class="sparkle-field" aria-hidden="true"></div>
+    <div class="plus-sparkle" style="top: 12%; left: 8%;" aria-hidden="true"></div>
+    <div class="plus-sparkle" style="top: 20%; left: 90%; animation-delay: 0.5s;" aria-hidden="true"></div>
+    <div class="plus-sparkle" style="top: 70%; left: 5%; animation-delay: 1s;" aria-hidden="true"></div>
+    <div class="plus-sparkle" style="top: 85%; left: 92%; animation-delay: 1.5s;" aria-hidden="true"></div>
+    <div class="plus-sparkle" style="top: 45%; left: 95%; animation-delay: 0.8s;" aria-hidden="true"></div>
+    <main class="wizard-card">
+      <section class="hero">
+        <h1>Project intake</h1>
+        <p>Welcome. I am the Architech Wizard. You can use your voice to fill this form out — just press the microphone button. Here are some quick tips: mention the county, the dates, and the company name clearly.</p>
+      </section>
+
+      <div id="wizardTip" style="padding:14px 20px;background:var(--accent-soft);border:1px solid var(--border);border-radius:14px;margin:0 0 20px;color:var(--text);font-size:0.95rem;line-height:1.5;">
+        <strong>Wizard tip:</strong> Speak naturally. For example: <em>"FPL will upgrade pipes in Orange County from June 1 to June 30."</em>
+      </div>
+
+      <form id="projectWizard" novalidate>
+        <div class="guide-banner">Guide step 1: project details</div>
+        <p class="helper-text">This wizard keeps the process simple: enter the project basics, confirm the timeline, and let the system guide you to the next step.</p>
+        <div class="field">
+          <label for="projectName">Project name</label>
+          <input id="projectName" name="projectName" type="text" placeholder="Example: Lakeview Utility Upgrade" />
+          <div class="voice-row">
+            <button type="button" class="voice-button" id="voiceButton">Use voice input</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="company">Company</label>
+          <input id="company" name="company" type="text" placeholder="Example: Harbor Utilities" />
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label for="county">County</label>
+            <select id="county" name="county">
+              <option value="Alachua">Alachua</option>
+              <option value="Baker">Baker</option>
+              <option value="Bay">Bay</option>
+              <option value="Bradford">Bradford</option>
+              <option value="Brevard">Brevard</option>
+              <option value="Broward">Broward</option>
+              <option value="Calhoun">Calhoun</option>
+              <option value="Charlotte">Charlotte</option>
+              <option value="Citrus">Citrus</option>
+              <option value="Clay">Clay</option>
+              <option value="Collier">Collier</option>
+              <option value="Columbia">Columbia</option>
+              <option value="Dade">Miami-Dade</option>
+              <option value="DeSoto">DeSoto</option>
+              <option value="Dixie">Dixie</option>
+              <option value="Duval">Duval</option>
+              <option value="Escambia">Escambia</option>
+              <option value="Flagler">Flagler</option>
+              <option value="Franklin">Franklin</option>
+              <option value="Gadsden">Gadsden</option>
+              <option value="Gilchrist">Gilchrist</option>
+              <option value="Glades">Glades</option>
+              <option value="Gulf">Gulf</option>
+              <option value="Hamilton">Hamilton</option>
+              <option value="Hardee">Hardee</option>
+              <option value="Hendry">Hendry</option>
+              <option value="Hernando">Hernando</option>
+              <option value="Highlands">Highlands</option>
+              <option value="Hillsborough">Hillsborough</option>
+              <option value="Holmes">Holmes</option>
+              <option value="Indian River">Indian River</option>
+              <option value="Jackson">Jackson</option>
+              <option value="Jefferson">Jefferson</option>
+              <option value="Lafayette">Lafayette</option>
+              <option value="Lake">Lake</option>
+              <option value="Lee">Lee</option>
+              <option value="Leon">Leon</option>
+              <option value="Levy">Levy</option>
+              <option value="Liberty">Liberty</option>
+              <option value="Madison">Madison</option>
+              <option value="Manatee">Manatee</option>
+              <option value="Marion">Marion</option>
+              <option value="Martin">Martin</option>
+              <option value="Monroe">Monroe</option>
+              <option value="Nassau">Nassau</option>
+              <option value="Okaloosa">Okaloosa</option>
+              <option value="Okeechobee">Okeechobee</option>
+              <option value="Orange">Orange</option>
+              <option value="Osceola">Osceola</option>
+              <option value="Palm Beach">Palm Beach</option>
+              <option value="Pasco">Pasco</option>
+              <option value="Pinellas">Pinellas</option>
+              <option value="Polk">Polk</option>
+              <option value="Putnam">Putnam</option>
+              <option value="Santa Rosa">Santa Rosa</option>
+              <option value="Sarasota">Sarasota</option>
+              <option value="Seminole">Seminole</option>
+              <option value="St. Johns">St. Johns</option>
+              <option value="St. Lucie">St. Lucie</option>
+              <option value="Sumter">Sumter</option>
+              <option value="Suwanee">Suwanee</option>
+              <option value="Taylor">Taylor</option>
+              <option value="Union">Union</option>
+              <option value="Volusia">Volusia</option>
+              <option value="Wakulla">Wakulla</option>
+              <option value="Walton">Walton</option>
+              <option value="Washington">Washington</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" placeholder="Example: We are upgrading the water main and sidewalk in the downtown corridor."></textarea>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label for="startDate">Start date</label>
+            <input id="startDate" name="startDate" type="date" />
+          </div>
+
+          <div class="field">
+            <label for="endDate">End date</label>
+            <input id="endDate" name="endDate" type="date" />
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="submit" class="primary-button">Save details</button>
+          <button type="button" class="secondary-button" id="aiButton">Extract with AI</button>
+          <button type="button" class="secondary-button" id="clearButton">Clear</button>
+        </div>
+        <p class="status" id="status" aria-live="polite"></p>
+        <p id="transcript" style="font-size:0.85rem;color:var(--muted);margin-top:8px;min-height:1.4em;">Voice transcript will appear here.</p>
+
+        <div style="margin-top:14px;padding:16px;background:var(--bg-panel);border:1px solid var(--border);border-radius:12px;">
+          <label for="demoText" style="font-weight:700;color:var(--text);">Quick text demo (no speaking) v1:</label>
+          <textarea id="demoText" rows="2" style="width:100%;margin-top:6px;padding:10px;background:var(--card-bg);color:var(--text);border:1px solid var(--border);border-radius:10px;resize:vertical;font-size:0.95rem;" placeholder="Ex: Upgrade water main in Orange County from June 1 to June 30"></textarea>
+          <button type="button" class="secondary-button" id="demoButton" style="margin-top:8px;">Run AI extract on text</button>
+          <p id="demoResult" style="margin-top:8px;font-size:0.9rem;color:var(--text);min-height:1.2em;"></p>
+        </div>
+
+        <p style="margin-top:12px;font-size:0.9rem;color:#627d8b;">← <a href="index.html">Back to wizard</a> | <a href="onboarding.html">Back to start</a> | <a href="map.html">County map</a></p>
+
+      </form>
+    </main>
+
+    <script src="wizard-voice.js"></script>
+    <script>
+      const STORAGE_KEY = 'projectWizardDraft';
+      const form = document.getElementById('projectWizard');
+      const projectNameInput = document.getElementById('projectName');
+      const companyInput = document.getElementById('company');
+      const descriptionInput = document.getElementById('description');
+      const countyInput = document.getElementById('county');
+      const startDateInput = document.getElementById('startDate');
+      const endDateInput = document.getElementById('endDate');
+      const statusElement = document.getElementById('status');
+
+      function setStatus(message, type = '') {
+        statusElement.textContent = message;
+        statusElement.className = 'status';
+        if (type) {
+          statusElement.classList.add(type);
+        }
+      }
+
+      function restoreDraft() {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+
+        try {
+          const draft = JSON.parse(raw);
+          projectNameInput.value = draft.projectName || '';
+          companyInput.value = draft.company || '';
+          descriptionInput.value = draft.description || '';
+          countyInput.value = draft.county || 'Orange';
+          startDateInput.value = draft.startDate || '';
+          endDateInput.value = draft.endDate || '';
+        } catch (error) {
+          localStorage.removeItem(STORAGE_KEY);
+        }
+      }
+
+      function saveDraft() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          projectName: projectNameInput.value.trim(),
+          company: companyInput.value.trim(),
+          description: descriptionInput.value.trim(),
+          county: countyInput.value,
+          startDate: startDateInput.value,
+          endDate: endDateInput.value
+        }));
+      }
+
+      function validateProject() {
+        if (!projectNameInput.value.trim()) {
+          return 'Please enter a project name.';
+        }
+
+        if (!startDateInput.value) {
+          return 'Please select a start date.';
+        }
+
+        if (startDate < new Date(new Date().setHours(0,0,0,0))) {
+          return 'Start date must be today or in the future.';
+        }
+
+        if (!endDateInput.value) {
+          return 'Please select an end date.';
+        }
+
+        const startDate = new Date(startDateInput.value);
+        const endDate = new Date(endDateInput.value);
+
+        if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
+          return 'Please provide valid dates.';
+        }
+
+        if (endDate < startDate) {
+          return 'End date must be on or after the start date.';
+        }
+
+        return '';
+      }
+
+      [projectNameInput, companyInput, descriptionInput, countyInput, startDateInput, endDateInput].forEach((field) => {
+        field.addEventListener('input', saveDraft);
+        field.addEventListener('change', saveDraft);
+      });
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const errorMessage = validateProject();
+        if (errorMessage) {
+          setStatus(errorMessage, 'error');
+          return;
+        }
+
+        const toUTCISO = (dateStr) => {
+          const [y,m,d] = dateStr.split('-').map(Number);
+          return new Date(Date.UTC(y, m-1, d)).toISOString();
+        };
+
+        const payload = {
+          title: projectNameInput.value.trim(),
+          description: descriptionInput.value.trim(),
+          county: countyInput.value,
+          startTime: toUTCISO(startDateInput.value),
+          endTime: toUTCISO(endDateInput.value),
+          company: companyInput.value.trim() || 'Unspecified'
+        };
+
+        // First check for conflicts using form dates directly
+        try {
+          const checkRes = await fetch('/api/projects/conflicts?county='+encodeURIComponent(payload.county)+'&startTime='+encodeURIComponent(payload.startTime)+'&endTime='+encodeURIComponent(payload.endTime));
+          const checkData = await checkRes.json();
+          if (checkData.conflictCount > 0) {
+            // Store original dates along with conflict data for display
+            sessionStorage.setItem('conflictCheck', JSON.stringify({
+              ...checkData,
+              queryCounty: payload.county,
+              queryStartTime: payload.startTime,
+              queryEndTime: payload.endTime
+            }));
+            window.location.href = 'conflict_check.html';
+            return;
+          }
+        } catch (e) {
+          console.error('Conflict check error:', e);
+        }
+
+        try {
+          const response = await fetch('/api/projects', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          const result = await response.json();
+          if (response.status === 409 && result.conflicts) {
+            sessionStorage.setItem('conflictCheck', JSON.stringify({
+              county: payload.county,
+              startTime: payload.startTime,
+              endTime: payload.endTime,
+              title: payload.title,
+              description: payload.description,
+              conflictCount: result.conflicts.length,
+              conflicts: result.conflicts,
+              nearestWindow: result.nearestWindow || null
+            }));
+            window.location.href = 'conflict_check.html';
+            return;
+          }
+          if (!response.ok) {
+            throw new Error(result.error || 'Failed to save project details.');
+          }
+
+          saveDraft();
+          setStatus('Project details saved successfully. No conflicts detected.', 'success');
+          if (window.BroadcastChannel) {
+            const ch = new BroadcastChannel('sperry-refresh');
+            ch.postMessage({ county: payload.county, refresh: true });
+          }
+        } catch (error) {
+          setStatus(error.message || 'Unable to save project details.', 'error');
+        }
+      });
+
+      document.getElementById('aiButton').addEventListener('click', async () => {
+        const text = descriptionInput.value.trim();
+        if (!text) { setStatus('Add a description first.', 'error'); return; }
+        setStatus('Sending to Gemini / backend...');
+        try {
+          const res = await fetch('/api/ai/extract', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text })
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'AI extraction failed');
+          const ext = data.county || data.title || 'N/A';
+          setStatus('AI found: '+ext, 'success');
+        } catch (e) {
+          setStatus(e.message || 'AI error', 'error');
+        }
+      });
+
+      document.getElementById('demoButton').addEventListener('click', async () => {
+        const text = document.getElementById('demoText').value.trim();
+        const out = document.getElementById('demoResult');
+        if (!text) { out.textContent = 'Enter some text first.'; out.style.color = '#c63d3d'; return; }
+        out.textContent = 'Sending...'; out.style.color = '#183246';
+        try {
+          const res = await fetch('/api/ai/extract', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text }) });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'AI failed');
+          out.innerHTML = '<strong>County:</strong> '+(data.county||'N/A')+' · <strong>Start:</strong> '+(data.startTime?new Date(data.startTime).toLocaleDateString():'N/A')+' · <strong>End:</strong> '+(data.endTime?new Date(data.endTime).toLocaleDateString():'N/A')+' · <strong>Title:</strong> '+(data.title||'N/A');
+          out.style.color = '#0d7d61';
+          // Auto-fill form too
+          if (data.title) projectNameInput.value = data.title;
+          if (data.county) countyInput.value = data.county;
+          if (data.description) descriptionInput.value = data.description;
+          if (data.startTime) startDateInput.value = new Date(data.startTime).toISOString().split('T')[0];
+          if (data.endTime) endDateInput.value = new Date(data.endTime).toISOString().split('T')[0];
+          saveDraft();
+        } catch (e) {
+          out.textContent = 'Error: ' + (e.message || 'unknown');
+          out.style.color = '#c63d3d';
+        }
+      });
+
+      document.getElementById('clearButton').addEventListener('click', () => {
+        form.reset();
+        localStorage.removeItem(STORAGE_KEY);
+        setStatus('Draft cleared.', 'success');
+      });
+
+      document.getElementById('voiceButton').addEventListener('click', async () => {
+        if (!navigator.mediaDevices || !window.MediaRecorder) {
+          setStatus('Recording not supported.', 'error'); return;
+        }
+        setStatus('Recording... press button again to stop.');
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          const mediaRecorder = new MediaRecorder(stream);
+          const chunks = [];
+          mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+          mediaRecorder.start();
+          let stopped = false;
+          const stopHandler = () => {
+            if (stopped || mediaRecorder.state === 'inactive') return;
+            stopped = true;
+            mediaRecorder.stop();
+            stream.getTracks().forEach(t => t.stop());
+          };
+          document.getElementById('voiceButton').addEventListener('click', stopHandler, { once: true });
+          setTimeout(stopHandler, 6000);
+          mediaRecorder.onstop = async () => {
+            const blob = new Blob(chunks, { type: 'audio/webm' });
+            const reader = new FileReader();
+            reader.onloadend = async () => {
+              const base64 = reader.result.split(',')[1];
+              setStatus('Sending audio to Eleven Labs → Gemini...');
+              try {
+                const res = await fetch('/api/ai/extract', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ audioBase64: base64, mimeType: 'audio/webm' })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'AI failed');
+                if (data.title) projectNameInput.value = data.title;
+                if (data.county) countyInput.value = data.county;
+                if (data.company) companyInput.value = data.company;
+                if (data.description) descriptionInput.value = data.description;
+                if (data.company) companyInput.value = data.company;
+                if (data.startTime) startDateInput.value = new Date(data.startTime).toISOString().split('T')[0];
+                if (data.endTime) endDateInput.value = new Date(data.endTime).toISOString().split('T')[0];
+                saveDraft();
+                document.getElementById('transcript').textContent = 'Heard: ' + (data.transcript || 'No transcript');
+                setStatus('Filled from voice: ' + (data.county || data.title || 'OK'), 'success');
+              } catch (e) {
+                setStatus('Audio parsing failed: ' + (e.message || 'unknown'), 'error');
+              }
+            };
+            reader.readAsDataURL(blob);
+          };
+        } catch (e) {
+          setStatus('Microphone error: ' + (e.message || ''), 'error');
+        }
+      });
+
+      restoreDraft();
+
+      // Clear any lingering conflict state when returning to intake (load or back-navigation)
+      sessionStorage.removeItem('conflictCheck');
+
+      window.addEventListener('pageshow', () => {
+        sessionStorage.removeItem('conflictCheck');
+      });
+
+      // Welcome with same wizard voice
+      window.addEventListener('load', () => {
+        setTimeout(() => speakWizard('Greetings, builder. You may speak your project into being—tell me the county, the dates, and the company of your project and i shall ponder my orb and see if there are any conflicts.'), 800);
+      });
+
+      function sayWizardWelcome() {
+        speakWizard('Greetings. Speak freely, and I shall assist you.');
+      }
+    </script>
+  </body>
+</html>

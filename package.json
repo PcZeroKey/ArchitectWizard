@@ -1,0 +1,18 @@
+{
+  "name": "construction-project-backend",
+  "version": "1.0.0",
+  "description": "Construction project coordination backend",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test:ai": "node ai.test.js",
+    "deploy": "echo 'Deploy to GoDaddy (shadow-wizard-architect-gang.us) — configure HTTPS / PM2 / Docker in .env'"
+  },
+  "dependencies": {
+    "@google/genai": "^2.24.0",
+    "dotenv": "^18.0.4",
+    "elevenlabs": "^1.59.0",
+    "express": "^4.22.3",
+    "mongodb": "^6.21.0"
+  }
+}

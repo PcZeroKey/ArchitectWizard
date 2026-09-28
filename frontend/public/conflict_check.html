@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=IM+Fell+English&display=swap" rel="stylesheet">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Conflict Check</title>
+<style>
+  :root{
+    --bg-dark:#150f28;
+    --bg-panel:#1f1638;
+    --card-bg:#2f2358;
+    --primary:#7c4dff;
+    --primary-dark:#5a32d6;
+    --primary-soft:#3a2d66;
+    --accent:#c9a227;
+    --accent-soft:#3a2d52;
+    --text:#ece3ff;
+    --muted:#b3a4d9;
+    --border:#4a3b7a;
+    --success:#4fd6a8;
+    --error:#ff6b6b;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;min-height:100vh;background:radial-gradient(circle at top, #2b1f4d 0%, #150f28 60%, #0d0a1a 100%);font-family:'IM Fell English', Georgia, serif;color:var(--text);display:flex;align-items:center;justify-content:center;padding:24px;}
+  .card{position:relative;z-index:1;width:min(100%,720px);background:var(--card-bg);border:1px solid var(--border);border-radius:24px;padding:28px;box-shadow:0 0 44px rgba(124, 77, 255, 0.3);}
+  .header-pill{display:inline-block;margin-bottom:12px;padding:7px 12px;border-radius:999px;background:var(--primary-soft);border:1px solid var(--border);color:var(--accent);font-size:0.72rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;}
+  h1{margin:0 0 8px;font-family:'Cinzel', serif;font-size:1.9rem;color:var(--accent);text-shadow:0 0 18px rgba(201, 162, 39, 0.4);}
+  p{color:var(--muted);margin:0 0 18px;line-height:1.6;}
+  textarea{width:100%;min-height:120px;padding:12px;border:1px solid var(--border);border-radius:12px;font-size:1rem;font-family:inherit;resize:vertical;background:var(--bg-panel);color:var(--text);}
+  button{background:linear-gradient(135deg,var(--primary) 0%, var(--primary-dark) 100%);color:#fff;border:none;border-radius:12px;padding:12px 18px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:12px;box-shadow:0 0 20px rgba(124, 77, 255, 0.4);}
+  .status{min-height:24px;margin-top:14px;font-weight:700;color:var(--text);}
+  .success{color:var(--success);}
+  .error{color:var(--error);}
+  .result{margin-top:16px;padding:14px;background:var(--bg-panel);border:1px solid var(--border);border-radius:12px;line-height:1.4;color:var(--text);}
+  a{color:var(--accent);}
+  a:hover{color:var(--text);}
+
+  .sparkle-field {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .sparkle-field::before,
+  .sparkle-field::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(3px 3px at 20px 30px, var(--accent), transparent),
+      radial-gradient(4px 4px at 160px 120px, var(--text), transparent),
+      radial-gradient(2px 2px at 90px 200px, var(--accent), transparent),
+      radial-gradient(3px 3px at 280px 60px, var(--text), transparent),
+      radial-gradient(4px 4px at 340px 220px, var(--accent), transparent),
+      radial-gradient(2px 2px at 420px 140px, var(--text), transparent),
+      radial-gradient(3px 3px at 60px 320px, var(--accent), transparent),
+      radial-gradient(4px 4px at 500px 90px, var(--text), transparent),
+      radial-gradient(3px 3px at 130px 380px, var(--accent), transparent),
+      radial-gradient(2px 2px at 240px 340px, var(--text), transparent);
+    background-repeat: repeat;
+    background-size: 300px 220px;
+    animation: sparkle-drift 60s linear infinite, sparkle-twinkle 3s ease-in-out infinite alternate;
+    opacity: 0.85;
+  }
+
+  .sparkle-field::after {
+    background-size: 380px 280px;
+    animation-duration: 90s, 4s;
+    animation-delay: 0s, 1.5s;
+    opacity: 0.55;
+  }
+
+  @keyframes sparkle-drift {
+    from { transform: translateY(0); }
+    to { transform: translateY(-400px); }
+  }
+
+  @keyframes sparkle-twinkle {
+    from { opacity: 0.3; }
+    to { opacity: 1; }
+  }
+
+  .plus-sparkle {
+    position: fixed;
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.9;
+    animation: plus-twinkle 2.5s ease-in-out infinite alternate;
+  }
+
+  .plus-sparkle::before,
+  .plus-sparkle::after {
+    content: '';
+    position: absolute;
+    background: var(--accent);
+    box-shadow: 0 0 12px 2px var(--accent), 0 0 24px 4px rgba(124, 77, 255, 0.6);
+    border-radius: 2px;
+  }
+
+  .plus-sparkle::before {
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    transform: translateY(-50%);
+  }
+
+  .plus-sparkle::after {
+    left: 50%;
+    top: 0;
+    width: 4px;
+    height: 100%;
+    transform: translateX(-50%);
+  }
+
+  @keyframes plus-twinkle {
+    from { opacity: 0.4; transform: scale(0.8); }
+    to { opacity: 1; transform: scale(1.15); }
+  }
+</style>
+</head>
+<body>
+  <div class="sparkle-field" aria-hidden="true"></div>
+  <div class="plus-sparkle" style="top: 10%; left: 8%;" aria-hidden="true"></div>
+  <div class="plus-sparkle" style="top: 85%; left: 90%; animation-delay: 1s;" aria-hidden="true"></div>
+<main class="card">
+  <span class="header-pill">Guide check</span>
+  <h1>Project conflict check</h1>
+  <form id="conflictForm" novalidate style="display:none;"></form>
+  <p id="status" class="status" aria-live="polite"></p>
+  <div id="result" class="result" style="display:none;"></div>
+  <p style="text-align:center;margin-top:14px;color:#627d8b;font-size:0.9rem;">← <a href="intake.html">Back to intake</a> | <a href="map.html">County map</a> | <a href="onboarding.html">Start</a></p>
+</main>
+<script src="wizard-voice.js"></script>
+<script>
+function fmtUTC(dateStr) {
+  if (!dateStr) return 'N/A';
+  const d = new Date(dateStr);
+  return `${String(d.getUTCMonth()+1).padStart(2,'0')}/${String(d.getUTCDate()).padStart(2,'0')}/${d.getUTCFullYear()}`;
+}
+
+const form = document.getElementById('conflictForm');
+  const status = document.getElementById('status');
+  const result = document.getElementById('result');
+
+  function setStatus(msg, type=''){
+    status.textContent = msg;
+    status.className = 'status';
+    if(type) status.classList.add(type);
+  }
+
+  function speakWizardConflict() {
+    const conflicts = result.querySelectorAll('li');
+    const count = conflicts.length;
+    let msg = 'The conflict check is complete.';
+    if (count > 0) msg += ' I see ' + count + ' overlapping timelines. Study them well, and consider the nearest window for your work.';
+    else msg += ' No clashes found. You are clear to proceed.';
+    speakWizard(msg);
+  }
+
+  // Pre-load from intake redirect
+  window.addEventListener('load', () => {
+    try {
+      const saved = sessionStorage.getItem('conflictCheck');
+      if (saved) {
+        const data = JSON.parse(saved);
+        const queryCounty = data.queryCounty || data.county || 'N/A';
+        const queryStartTime = data.queryStartTime || data.startTime;
+        const queryEndTime = data.queryEndTime || data.endTime;
+        result.style.display = 'block';
+        result.innerHTML = '<strong>County:</strong> '+queryCounty+
+          '<br><strong>Dates:</strong> '+(queryStartTime?fmtUTC(queryStartTime):'N/A')+
+          ' to '+(queryEndTime?fmtUTC(queryEndTime):'N/A')+
+          '<br><strong>Conflicts:</strong> '+(data.conflictCount||0);
+        if(data.conflicts && data.conflicts.length){
+          result.innerHTML += '<ul>' + data.conflicts.map(c=>'<li><strong>'+ (c.title||'Untitled') +'</strong> ('+(c.company||'Unknown')+') — '+(c.startTime?fmtUTC(c.startTime):'N/A')+' to '+(c.endTime?fmtUTC(c.endTime):'N/A')+'</li>').join('') + '</ul>';
+          if (data.nearestWindow) {
+            result.innerHTML += '<p style="margin-top:10px;color:#0d7d61;font-weight:700;">Remediation: the nearest available window for your project starts on <strong>'+fmtUTC(data.nearestWindow)+'</strong>.</p>';
+          } else {
+            const ends = data.conflicts.map(c => new Date(c.endTime || c.startTime)).filter(d => !isNaN(d));
+            if (ends.length) {
+              const latest = new Date(Math.max(...ends));
+              const after = new Date(latest.getTime() + 24*60*60*1000);
+              result.innerHTML += '<p style="margin-top:10px;color:#0d7d61;font-weight:700;">Remediation: the nearest available window for your project starts on <strong>'+fmtUTC(new Date(after.getTime()).toISOString())+'</strong>.</p>';
+            }
+          }
+        }
+        setStatus('Conflict check complete.', 'success');
+        speakWizardConflict();
+        // Keep sessionStorage so refresh shows result; intake.html clears it on return
+      }
+    } catch(e){}
+    setTimeout(() => speakWizard('Ah, the conflict check, It seems a fellow wizard has already scheduled a project during that time. Go back to the previous page and edit your time selection using my orbs reccomendation.'), 800);
+  });
+
+  form.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const text = document.getElementById('textInput').value.trim();
+    if(!text){ setStatus('Enter a description.', 'error'); return; }
+    setStatus('Analyzing with Gemini + backend...');
+    try{
+      const res = await fetch('/api/ai/check-conflicts', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({text})
+      });
+      const data = await res.json();
+      if(!res.ok){ throw new Error(data.error || 'Check failed'); }
+      result.style.display = 'block';
+      result.innerHTML = '<strong>County:</strong> '+(data.county||'N/A')+
+        '<br><strong>Dates:</strong> '+(data.startTime?new Date(data.startTime).toLocaleDateString():'N/A')+
+        ' to '+(data.endTime?new Date(data.endTime).toLocaleDateString():'N/A')+
+        '<br><strong>Conflicts:</strong> '+(data.conflictCount||0)+
+        '<br><strong>Title:</strong> '+(data.title||'N/A');
+      if(data.conflicts && data.conflicts.length){
+        result.innerHTML += '<ul>' + data.conflicts.map(c=>'<li><strong>'+ (c.title||'Untitled') +'</strong> ('+(c.company||'Unknown')+') — '+(c.startTime?fmtUTC(c.startTime):'N/A')+' to '+(c.endTime?fmtUTC(c.endTime):'N/A')+'</li>').join('') + '</ul>';
+        const latestStr = data.nearestWindow ? fmtUTC(data.nearestWindow) : null;
+        if (latestStr) {
+          result.innerHTML += '<p style="margin-top:10px;color:#0d7d61;font-weight:700;">Remediation: the nearest available window for your project starts on <strong>'+latestStr+'</strong>.</p>';
+        } else {
+          const ends = data.conflicts.map(c => new Date(c.endTime || c.startTime)).filter(d => !isNaN(d));
+          if (ends.length) {
+            const latest = new Date(Math.max(...ends));
+            const after = new Date(latest.getTime() + 24*60*60*1000);
+            result.innerHTML += '<p style="margin-top:10px;color:#0d7d61;font-weight:700;">Remediation: the nearest available window for your project starts on <strong>'+fmtUTC(new Date(after.getTime()).toISOString())+'</strong>.</p>';
+          }
+        }
+      }
+      setStatus('Conflict check complete.', 'success');
+      speakWizardConflict();
+    }catch(err){
+      setStatus(err.message || 'Error', 'error');
+      result.style.display = 'none';
+    }
+  });
+</script>
+</body>
+</html>
